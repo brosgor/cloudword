@@ -11,14 +11,7 @@ import matplotlib.pyplot as plt
 nlp = spacy.load('es_core_news_sm')
 
 words = [
-    """     Apoyo para lograr aplicar las pedagogías adquiridas en las actualizaciones. Apoyo como monitores y/o asistentes docentes (estudiantes de maestria)
-    """,
-    """  Normativa para obligar a los profesores a tomar cursos o charlas para actualización pedagógica.
-    """,
-    """  Realizar capacitaciones/talleres de manera más periódica, buscando estrategias para estimular la participación de los docentes
-    """,
-    """  Se debería propiciar la participación activa como parte de la jornada en procesos de formación y actualización pedagógica, con énfasis en nuevos recursos tecnológicos , metodológicos y de innovación.
-    """
+  ""
 ]
 
 # Unir todos los textos en uno solo
