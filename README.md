@@ -21,7 +21,7 @@ Un generador de nubes de palabras en español que utiliza procesamiento de lengu
 
 ### 1. Clonar el repositorio
 ```bash
-git clone <tu-repositorio>
+git clone https://github.com/brosgor/cloudword.git
 cd cloudword
 ```
 
@@ -81,8 +81,7 @@ El script procesa textos en español y genera nubes de palabras enfocadas en las
 ## Autor
 
 **Alfonso Suárez** (brosgor)  
-Email: alfonso.suarez.dev@gmail.com
 
 ## Licencia
 
-Este proyecto está bajo la Licencia MIT.
+Este proyecto está bajo la Licencia GPL v3. Consulta el archivo [LICENSE](LICENSE) para más detalles.
