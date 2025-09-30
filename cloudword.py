@@ -10,8 +10,21 @@ import matplotlib.pyplot as plt
 # Cargar el modelo de spaCy en español
 nlp = spacy.load('es_core_news_sm')
 
+# Agregar stopwords personalizados
+custom_stopwords = {
+    'puede', 'pueden', 'debe', 'deben', 'hace', 'hacen', 
+    'dice', 'dicen', 'vez', 'veces', 'forma', 'manera',
+    'través', 'ejemplo', 'casos', 'caso', 'tipo', 'tipos',
+    'parte', 'partes', 'lugar', 'lugares', 'tiempo', 'momento',
+    "programa","universidad","pregrado","carrera","problema"
+}
+
+# Agregar las stopwords personalizadas al modelo de spaCy
+for word in custom_stopwords:
+    nlp.vocab[word].is_stop = True
+
 words = [
-  ""
+""
 ]
 
 # Unir todos los textos en uno solo
@@ -22,6 +35,7 @@ doc = nlp(text.lower())
 
 # Filtrar tokens: solo palabras (no puntuación), no stopwords, no espacios, longitud > 2
 # y excluir palabras que no son sustantivos, adjetivos o verbos principales
+#tener en cuenta los bigramas
 filtered_words = []
 for token in doc:
     if (not token.is_stop and  # No es stopword
