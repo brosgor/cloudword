@@ -16,7 +16,7 @@ custom_stopwords = {
     'dice', 'dicen', 'vez', 'veces', 'forma', 'manera',
     'través', 'ejemplo', 'casos', 'caso', 'tipo', 'tipos',
     'parte', 'partes', 'lugar', 'lugares', 'tiempo', 'momento',
-    "programa","universidad","pregrado","carrera","problema"
+    'programa','universidad','pregrado','carrera','problema','estudiante',
 }
 
 # Agregar las stopwords personalizadas al modelo de spaCy
@@ -24,7 +24,9 @@ for word in custom_stopwords:
     nlp.vocab[word].is_stop = True
 
 words = [
-""
+"""
+Aqui va el texto del cual quieres generar la nube de palabras.
+"""
 ]
 
 # Unir todos los textos en uno solo
