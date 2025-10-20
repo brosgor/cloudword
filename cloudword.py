@@ -1,23 +1,34 @@
 from wordcloud import WordCloud
 import spacy
 import pandas as pd
-# nube de palabras
-# extrae palabras de un texto usando spaCy para procesamiento de lenguaje natural en español
 import matplotlib.pyplot as plt
-
-# Cargar el modelo de spaCy en español
 nlp = spacy.load('es_core_news_sm')
+
+
 def getDocument(database = None, column = None):
     if database is None or column is None:
-            words = [
+        words = [
     """
     Aqui va el texto del cual quieres generar la nube de palabras.
     """
     ]
     else:
+        df = pd.read_csv(database)
         
-        df = pd.read_csv(database)  # Asegúrate de que el archivo CSV esté en el mismo directorio
-        document = df[column].astype(str).str.cat(sep=' ')
+        # Verificar si hay columnas duplicadas
+        if df.columns.duplicated().any():
+            print("⚠️ ADVERTENCIA: El CSV tiene columnas duplicadas:")
+            duplicated_cols = df.columns[df.columns.duplicated()].tolist()
+            print(f"Columnas duplicadas: {duplicated_cols}")
+        
+        # Permitir selección por índice o nombre
+        if isinstance(column, int):
+            document = df.iloc[:, column].astype(str).str.cat(sep=' ')
+            print(f"✓ Usando columna #{column}: '{df.columns[column]}'")
+        else:
+            document = df[column].astype(str).str.cat(sep=' ')
+            print(f"✓ Usando columna: '{column}'")
+        
         words = [document] 
     return words
 # Agregar stopwords personalizados
@@ -33,7 +44,8 @@ custom_stopwords = {
 for word in custom_stopwords:
     nlp.vocab[word].is_stop = True
 
-words = getDocument()
+# Obtener el texto del documento
+words = getDocument(database='estudiantes.csv', column='Justifique la respuesta anterior (¿Por qué ?)')
 
 # Unir todos los textos en uno solo
 text = " ".join(words)

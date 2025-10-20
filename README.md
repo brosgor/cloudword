@@ -51,12 +51,48 @@ python -m spacy download es_core_news_sm
 
 ## Uso
 
-1. Edita el array `words` en `cloudword.py` con tu texto
-2. Ejecuta el script:
+Existen **dos formas** de generar nubes de palabras con este proyecto:
+
+### Método 1: Pegar texto directamente
+
+1. Abre el archivo `cloudword.py`
+2. En la función `getDocument()`, modifica el texto entre las comillas triples:
+```python
+words = getDocument()  # Sin parámetros
+```
+3. Edita el texto en la línea 11:
+```python
+words = [
+    """
+    Aquí va el texto del cual quieres generar la nube de palabras.
+    """
+]
+```
+4. Ejecuta el script:
 ```bash
 python cloudword.py
 ```
-3. La nube de palabras se guardará como `nube_palabras.png`
+
+### Método 2: Analizar datos desde un archivo CSV
+
+1. Asegúrate de tener tu archivo CSV en el directorio del proyecto
+2. En `cloudword.py`, modifica la llamada a `getDocument()` especificando el archivo y columna:
+```python
+words = getDocument(database='tu_archivo.csv', column='Nombre_de_la_Columna')
+```
+3. Ejecuta el script:
+```bash
+python cloudword.py
+```
+
+**Ejemplo con CSV:**
+```python
+words = getDocument(database='estudiantes.csv', column='Justifique la respuesta anterior (¿Por qué ?)')
+```
+
+### Resultado
+
+En ambos casos, la nube de palabras se guardará automáticamente como `nube_palabras.png` en el directorio del proyecto.
 
 ## Estructura del proyecto
 
@@ -71,12 +107,14 @@ cloudword/
 
 ## Ejemplo de uso
 
-El script procesa textos en español y genera nubes de palabras enfocadas en las palabras más significativas, ideal para:
+El script procesa textos en español y genera nubes de palabras enfocadas en las palabras más significativas. Soporta dos métodos de entrada:
 
-- Análisis de feedback educativo
-- Procesamiento de encuestas
-- Análisis de contenido textual
-- Visualización de temas principales
+1. **Texto directo**: Pega tu contenido directamente en el código
+2. **Análisis de CSV**: Procesa columnas de archivos CSV, ideal para:
+   - Análisis de feedback educativo
+   - Procesamiento de encuestas masivas
+   - Análisis de respuestas abiertas
+   - Visualización de temas principales en datasets
 
 ## Autor
 
