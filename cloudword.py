@@ -1,15 +1,25 @@
 from wordcloud import WordCloud
 import spacy
-import re
-
+import pandas as pd
 # nube de palabras
 # extrae palabras de un texto usando spaCy para procesamiento de lenguaje natural en español
-
 import matplotlib.pyplot as plt
 
 # Cargar el modelo de spaCy en español
 nlp = spacy.load('es_core_news_sm')
-
+def getDocument(database = None, column = None):
+    if database is None or column is None:
+            words = [
+    """
+    Aqui va el texto del cual quieres generar la nube de palabras.
+    """
+    ]
+    else:
+        
+        df = pd.read_csv(database)  # Asegúrate de que el archivo CSV esté en el mismo directorio
+        document = df[column].astype(str).str.cat(sep=' ')
+        words = [document] 
+    return words
 # Agregar stopwords personalizados
 custom_stopwords = {
     'puede', 'pueden', 'debe', 'deben', 'hace', 'hacen', 
@@ -23,11 +33,7 @@ custom_stopwords = {
 for word in custom_stopwords:
     nlp.vocab[word].is_stop = True
 
-words = [
-"""
-Aqui va el texto del cual quieres generar la nube de palabras.
-"""
-]
+words = getDocument()
 
 # Unir todos los textos en uno solo
 text = " ".join(words)

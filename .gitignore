@@ -1,2 +1,6 @@
 .venv/
 *.png
+*.csv
+__pycache__/
+*.pyc
+*.xlsx
