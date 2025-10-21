@@ -31,18 +31,23 @@ def getDocument(database = None, column = None):
         
         words = [document] 
     return words
-# Agregar stopwords personalizados
+# Agregar stopwords personalizados (tanto en forma original como lematizada)
 custom_stopwords = {
     'puede', 'pueden', 'debe', 'deben', 'hace', 'hacen', 
     'dice', 'dicen', 'vez', 'veces', 'forma', 'manera',
     'través', 'ejemplo', 'casos', 'caso', 'tipo', 'tipos',
     'parte', 'partes', 'lugar', 'lugares', 'tiempo', 'momento',
     'programa','universidad','pregrado','carrera','problema','estudiante',
+    'universitario',
+    
 }
 
 # Agregar las stopwords personalizadas al modelo de spaCy
 for word in custom_stopwords:
     nlp.vocab[word].is_stop = True
+    # También marcar el lexema (lema) como stopword
+    lexeme = nlp.vocab[word]
+    lexeme.is_stop = True
 
 # Obtener el texto del documento
 words = getDocument(database='estudiantes.csv', column='Justifique la respuesta anterior (¿Por qué ?)')
@@ -58,7 +63,10 @@ doc = nlp(text.lower())
 #tener en cuenta los bigramas
 filtered_words = []
 for token in doc:
+    # Verificar también si el lema está en las stopwords personalizadas
     if (not token.is_stop and  # No es stopword
+        token.lemma_.lower() not in custom_stopwords and  # Verificar lema contra stopwords personalizadas
+        token.text.lower() not in custom_stopwords and  # Verificar texto contra stopwords personalizadas
         not token.is_punct and  # No es puntuación
         not token.is_space and  # No es espacio
         len(token.text) > 2 and  # Más de 2 caracteres
