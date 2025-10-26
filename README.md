@@ -1,125 +1,152 @@
-# CloudWord - Generador de Nubes de Palabras
+# CloudWord - Generador de Nubes de Palabras con NER
 
-Un generador de nubes de palabras en español que utiliza procesamiento de lenguaje natural avanzado para crear visualizaciones significativas de texto.
+Generador de nubes de palabras en español con procesamiento de lenguaje natural y reconocimiento de entidades nombradas.
 
 ## Características
 
-- **Procesamiento de lenguaje natural**: Utiliza spaCy para análisis morfológico avanzado
-- **Filtrado inteligente**: Elimina automáticamente stopwords, puntuación y palabras irrelevantes
-- **Lematización**: Convierte palabras a su forma base para evitar duplicados
-- **Filtrado por categoría**: Solo conserva sustantivos, adjetivos y verbos relevantes
-- **Exportación a imagen**: Genera archivos PNG de alta calidad
+- Procesamiento de lenguaje natural con spaCy
+- Reconocimiento de Entidades Nombradas (NER)
+- Filtrado inteligente de stopwords
+- Lematización automática
+- Nubes de palabras especializadas por tipo de entidad
+- Exportación a PNG de alta calidad
 
 ## Librerías utilizadas
 
-- **spaCy**: Procesamiento de lenguaje natural avanzado
-- **WordCloud**: Generación de nubes de palabras
-- **Matplotlib**: Visualización y exportación de imágenes
-- **es_core_news_sm**: Modelo de español para spaCy
+- **spaCy**: NLP y NER
+- **WordCloud**: Generación de nubes
+- **Matplotlib**: Visualización
+- **pandas**: Manejo de CSV
+- **es_core_news_md**: Modelo español (mediano, mejor precisión)
 
-## Instalación y configuración
+## Instalación
 
-### 1. Clonar el repositorio
 ```bash
 git clone https://github.com/brosgor/cloudword.git
 cd cloudword
-```
-
-### 2. Crear entorno virtual
-```bash
 python3 -m venv .venv
-```
-
-### 3. Activar el entorno virtual
-```bash
-# En Linux/macOS:
-source .venv/bin/activate
-
-# En Windows:
-.venv\Scripts\activate
-```
-
-### 4. Instalar dependencias
-```bash
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+python -m spacy download es_core_news_md
 ```
 
-### 5. Descargar modelo de español para spaCy
+## Uso básico
+
+```python
+from cloudword import CloudWordAnalyzer
+
+analyzer = CloudWordAnalyzer()  # Usa es_core_news_md por defecto
+
+# Desde texto
+analyzer.load_document(text="Tu texto aquí")
+
+# Desde CSV
+analyzer.load_document(database='datos.csv', column='respuestas')
+
+# Nube tradicional
+analyzer.process_text()
+analyzer.save_wordcloud('nube.png')
+```
+
+## Reconocimiento de Entidades (NER)
+
+### Tipos de entidades
+
+- **PER**: Personas
+- **ORG**: Organizaciones/empresas
+- **LOC**: Ubicaciones
+- **MISC**: Otras entidades
+
+### Extraer entidades
+
+```python
+# Todas las entidades
+entidades = analyzer.extract_entities()
+
+# Solo organizaciones
+orgs = analyzer.extract_entities(entity_types=['ORG'])
+
+# Con conteo
+conteos = analyzer.get_entity_counts()
+```
+
+### Métodos específicos
+
+```python
+# Top 10 organizaciones
+top_orgs = analyzer.get_organizations(top_n=10)
+
+# Todas las personas
+personas = analyzer.get_persons()
+
+# Top 5 ubicaciones
+lugares = analyzer.get_locations(top_n=5)
+
+# Resumen en consola
+analyzer.print_entity_summary()
+```
+
+### Nubes de palabras por entidad
+
+```python
+# Solo organizaciones
+wc_orgs = analyzer.generate_entity_wordcloud(entity_type='ORG')
+analyzer.save_wordcloud('empresas.png', wordcloud=wc_orgs)
+
+# Solo personas
+wc_per = analyzer.generate_entity_wordcloud(entity_type='PER')
+analyzer.save_wordcloud('personas.png', wordcloud=wc_per)
+
+# Solo ubicaciones
+wc_loc = analyzer.generate_entity_wordcloud(entity_type='LOC')
+analyzer.save_wordcloud('lugares.png', wordcloud=wc_loc)
+```
+
+## Personalización
+
+```python
+# Stopwords personalizados
+custom = {'palabra1', 'palabra2'}
+analyzer = CloudWordAnalyzer(custom_stopwords=custom)
+
+# Filtros POS
+analyzer.process_text(pos_filter=['NOUN'])  # Solo sustantivos
+analyzer.process_text(pos_filter=['NOUN', 'ADJ'])  # Sustantivos y adjetivos
+
+# WordCloud personalizado
+wc = analyzer.generate_entity_wordcloud(
+    entity_type='ORG',
+    width=1200,
+    height=600,
+    background_color='black',
+    colormap='viridis'
+)
+```
+
+## Modelos disponibles
+
 ```bash
+# Pequeño (más rápido, menos preciso)
 python -m spacy download es_core_news_sm
+analyzer = CloudWordAnalyzer(model='es_core_news_sm')
+
+# Mediano (balanceado) - RECOMENDADO Y POR DEFECTO
+python -m spacy download es_core_news_md
+
+# Grande (más lento, máxima precisión)
+python -m spacy download es_core_news_lg
+analyzer = CloudWordAnalyzer(model='es_core_news_lg')
 ```
 
-## Uso
+## Limitaciones
 
-Existen **dos formas** de generar nubes de palabras con este proyecto:
-
-### Método 1: Pegar texto directamente
-
-1. Abre el archivo `cloudword.py`
-2. En la función `getDocument()`, modifica el texto entre las comillas triples:
-```python
-words = getDocument()  # Sin parámetros
-```
-3. Edita el texto en la línea 11:
-```python
-words = [
-    """
-    Aquí va el texto del cual quieres generar la nube de palabras.
-    """
-]
-```
-4. Ejecuta el script:
-```bash
-python cloudword.py
-```
-
-### Método 2: Analizar datos desde un archivo CSV
-
-1. Asegúrate de tener tu archivo CSV en el directorio del proyecto
-2. En `cloudword.py`, modifica la llamada a `getDocument()` especificando el archivo y columna:
-```python
-words = getDocument(database='tu_archivo.csv', column='Nombre_de_la_Columna')
-```
-3. Ejecuta el script:
-```bash
-python cloudword.py
-```
-
-**Ejemplo con CSV:**
-```python
-words = getDocument(database='estudiantes.csv', column='Justifique la respuesta anterior (¿Por qué ?)')
-```
-
-### Resultado
-
-En ambos casos, la nube de palabras se guardará automáticamente como `nube_palabras.png` en el directorio del proyecto.
-
-## Estructura del proyecto
-
-```
-cloudword/
-├── .venv/              # Entorno virtual
-├── cloudword.py        # Script principal
-├── requirements.txt    # Dependencias
-├── README.md          # Documentación
-└── nube_palabras.png  # Imagen generada
-```
-
-## Ejemplo de uso
-
-El script procesa textos en español y genera nubes de palabras enfocadas en las palabras más significativas. Soporta dos métodos de entrada:
-
-1. **Texto directo**: Pega tu contenido directamente en el código
-2. **Análisis de CSV**: Procesa columnas de archivos CSV, ideal para:
-   - Análisis de feedback educativo
-   - Procesamiento de encuestas masivas
-   - Análisis de respuestas abiertas
-   - Visualización de temas principales en datasets
+- NER no detecta cargos ("CEO", "Director")
+- Mejor precisión con texto que mantiene mayúsculas
 
 ## Autor
 
-**Alfonso Suárez** (brosgor)  
+Luis Pedraos (brosgor)
 
 ## Licencia
 
-Este proyecto está bajo la Licencia GPL v3. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+GPL v3
