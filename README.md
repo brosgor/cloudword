@@ -5,7 +5,8 @@ Generador de nubes de palabras en español con procesamiento de lenguaje natural
 ## Características
 
 - Procesamiento de lenguaje natural con spaCy
-- Reconocimiento de Entidades Nombradas (NER)
+- Reconocimiento de Entidades Nombradas (NER) híbrido (spaCy + regex)
+- Detección mejorada de organizaciones colombianas e internacionales
 - Filtrado inteligente de stopwords
 - Lematización automática
 - Nubes de palabras especializadas por tipo de entidad
@@ -35,7 +36,7 @@ python -m spacy download es_core_news_md
 ```python
 from cloudword import CloudWordAnalyzer
 
-analyzer = CloudWordAnalyzer()  # Usa es_core_news_md por defecto
+analyzer = CloudWordAnalyzer()
 
 # Desde texto
 analyzer.load_document(text="Tu texto aquí")
@@ -44,8 +45,12 @@ analyzer.load_document(text="Tu texto aquí")
 analyzer.load_document(database='datos.csv', column='respuestas')
 
 # Nube tradicional
-analyzer.process_text()
+analyzer.process_text(mode='words')
 analyzer.save_wordcloud('nube.png')
+
+# Nube de organizaciones
+analyzer.process_text(mode='organizations')
+analyzer.save_wordcloud('organizaciones.png')
 ```
 
 ## Reconocimiento de Entidades (NER)
@@ -57,70 +62,44 @@ analyzer.save_wordcloud('nube.png')
 - **LOC**: Ubicaciones
 - **MISC**: Otras entidades
 
-### Extraer entidades
+### Detección híbrida de organizaciones
+
+El sistema combina:
+- **NER de spaCy**: Detección automática basada en contexto
+- **Patrones regex**: Captura organizaciones específicas:
+  - Bancos: "Banco de Bogotá", "Banco de Occidente"
+  - Empresas conocidas: IBM, Microsoft, Rappi, Globant, Bancolombia, Ecopetrol
+  - Empresas SAS: "Seti SAS", "S4L S.A.S."
+  - Universidades: "Universidad Nacional de Colombia"
+
+### Modos de procesamiento
 
 ```python
-# Todas las entidades
-entidades = analyzer.extract_entities()
+# Palabras tradicionales (sustantivos, adjetivos, verbos)
+analyzer.process_text(mode='words')
 
 # Solo organizaciones
-orgs = analyzer.extract_entities(entity_types=['ORG'])
-
-# Con conteo
-conteos = analyzer.get_entity_counts()
-```
-
-### Métodos específicos
-
-```python
-# Top 10 organizaciones
-top_orgs = analyzer.get_organizations(top_n=10)
-
-# Todas las personas
-personas = analyzer.get_persons()
-
-# Top 5 ubicaciones
-lugares = analyzer.get_locations(top_n=5)
-
-# Resumen en consola
-analyzer.print_entity_summary()
-```
-
-### Nubes de palabras por entidad
-
-```python
-# Solo organizaciones
-wc_orgs = analyzer.generate_entity_wordcloud(entity_type='ORG')
-analyzer.save_wordcloud('empresas.png', wordcloud=wc_orgs)
+analyzer.process_text(mode='organizations')
 
 # Solo personas
-wc_per = analyzer.generate_entity_wordcloud(entity_type='PER')
-analyzer.save_wordcloud('personas.png', wordcloud=wc_per)
+analyzer.process_text(mode='persons')
 
 # Solo ubicaciones
-wc_loc = analyzer.generate_entity_wordcloud(entity_type='LOC')
-analyzer.save_wordcloud('lugares.png', wordcloud=wc_loc)
+analyzer.process_text(mode='locations')
+
+# Limitar a top N entidades
+analyzer.process_text(mode='organizations', top_n=20)
 ```
 
-## Personalización
+### Stopwords personalizadas
 
 ```python
-# Stopwords personalizados
-custom = {'palabra1', 'palabra2'}
-analyzer = CloudWordAnalyzer(custom_stopwords=custom)
+# Agregar stopwords adicionales (se suman a las default)
+analyzer = CloudWordAnalyzer(custom_stopwords={'DevOps', 'Intern', 'startup'})
 
-# Filtros POS
-analyzer.process_text(pos_filter=['NOUN'])  # Solo sustantivos
-analyzer.process_text(pos_filter=['NOUN', 'ADJ'])  # Sustantivos y adjetivos
-
-# WordCloud personalizado
-wc = analyzer.generate_entity_wordcloud(
-    entity_type='ORG',
-    width=1200,
-    height=600,
-    background_color='black',
-    colormap='viridis'
-)
+# Las stopwords se aplican inteligentemente:
+# - Palabras individuales: se filtran
+# - Frases completas: solo si coinciden exactamente
 ```
 
 ## Modelos disponibles
@@ -140,8 +119,9 @@ analyzer = CloudWordAnalyzer(model='es_core_news_lg')
 
 ## Limitaciones
 
-- NER no detecta cargos ("CEO", "Director")
-- Mejor precisión con texto que mantiene mayúsculas
+- NER no detecta cargos ("CEO", "Director") - se filtran automáticamente
+- Mejor precisión con modelo `md` o `lg`
+- Regex complementario optimizado para organizaciones colombianas
 
 ## Autor
 
